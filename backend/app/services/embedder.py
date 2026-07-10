@@ -139,7 +139,11 @@ def get_embedder() -> EmbedderBase:
     if _embedder_instance is None:
         provider = settings.EMBEDDING_PROVIDER
         if provider == "openai":
-            _embedder_instance = OpenAIEmbedder()
+            if settings.OPENAI_API_KEY.strip():
+                _embedder_instance = OpenAIEmbedder()
+            else:
+                logger.warning("OPENAI_API_KEY is not set; falling back to sentence-transformers embeddings")
+                _embedder_instance = SentenceTransformerEmbedder()
         elif provider == "sentence_transformers":
             _embedder_instance = SentenceTransformerEmbedder()
         else:

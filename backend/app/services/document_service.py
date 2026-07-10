@@ -28,7 +28,7 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 MAX_FILE_BYTES = settings.MAX_FILE_SIZE_MB * 1024 * 1024
 
 
-ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt", ".md", ".rst", ".csv"}
+ALLOWED_EXTENSIONS = {f".{ext.lower().lstrip('.')}" for ext in settings.ALLOWED_EXTENSIONS}
 
 
 def validate_document(file_path: Path, original_filename: str) -> None:
@@ -40,7 +40,8 @@ def validate_document(file_path: Path, original_filename: str) -> None:
     """
     ext = Path(original_filename).suffix.lower()
     if ext not in ALLOWED_EXTENSIONS:
-        raise ValueError(f"Only PDF and DOCX files are allowed. Got: {original_filename}")
+        allowed = ", ".join(sorted(ext.lstrip('.') for ext in ALLOWED_EXTENSIONS))
+        raise ValueError(f"Only the following file types are allowed: {allowed}. Got: {original_filename}")
 
     file_size = file_path.stat().st_size
     if file_size > MAX_FILE_BYTES:

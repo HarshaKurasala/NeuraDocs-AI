@@ -73,9 +73,9 @@ export default function UploadZone() {
         <input {...getInputProps()} />
         <Upload className="mx-auto mb-2 text-gray-400 dark:text-gray-500" size={28} />
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          {isDragActive ? 'Drop files here...' : 'Drag & drop PDFs, Word docs, or text files, or click to browse'}
+          {isDragActive ? 'Drop files here...' : 'Drag & drop PDFs or Word docs, or click to browse'}
         </p>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">PDF, DOCX, TXT, MD, CSV · Max 20MB per file</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">PDF, DOCX · Max 20MB per file</p>
       </div>
 
       {/* Pending files list */}

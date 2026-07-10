@@ -23,7 +23,8 @@ class Settings(BaseSettings):
     OPENAI_EMBEDDING_MODEL: str = "text-embedding-3-small"
 
     # ── Embedding provider: "openai" | "sentence_transformers" ───────────────
-    EMBEDDING_PROVIDER: Literal["openai", "sentence_transformers"] = "openai"
+    # Default to local embeddings so the app works without an API key.
+    EMBEDDING_PROVIDER: Literal["openai", "sentence_transformers"] = "sentence_transformers"
     SENTENCE_TRANSFORMER_MODEL: str = "all-MiniLM-L6-v2"
 
     # ── Chunking ─────────────────────────────────────────────────────────────
@@ -40,7 +41,7 @@ class Settings(BaseSettings):
 
     # ── File limits ──────────────────────────────────────────────────────────
     MAX_FILE_SIZE_MB: int = 20
-    ALLOWED_EXTENSIONS: list[str] = ["pdf"]
+    ALLOWED_EXTENSIONS: list[str] = ["pdf", "docx"]
 
     # ── CORS ─────────────────────────────────────────────────────────────────
     CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:3000"]
