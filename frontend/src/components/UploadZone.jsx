@@ -59,33 +59,23 @@ export default function UploadZone() {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.28em] text-slate-400 dark:text-slate-500">Ingestion</p>
-          <h3 className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">Add source documents</h3>
-        </div>
-        <span className="rounded-full border border-slate-200/80 dark:border-slate-700/80 bg-white/70 dark:bg-slate-950/50 px-3 py-1 text-[11px] text-slate-500 dark:text-slate-400">
-          PDF · DOCX · 20MB
-        </span>
-      </div>
-
       {/* Drop zone */}
       <div
         {...getRootProps()}
         className={`
-          border-2 border-dashed rounded-[26px] p-6 text-center cursor-pointer transition-all duration-200 shadow-sm
+          border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200
           ${isDragActive
-            ? 'border-primary-500 bg-primary-50/80 dark:bg-primary-900/20'
-            : 'border-slate-300/80 dark:border-slate-700/80 hover:border-primary-400 dark:hover:border-primary-500'
+            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+            : 'border-gray-300 dark:border-gray-600 hover:border-primary-400 dark:hover:border-primary-500'
           }
         `}
       >
         <input {...getInputProps()} />
-        <Upload className="mx-auto mb-3 text-primary-500" size={30} />
-        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-          {isDragActive ? 'Drop files here...' : 'Drag & drop PDFs or Word docs, or click to browse'}
+        <Upload className="mx-auto mb-2 text-gray-400 dark:text-gray-500" size={28} />
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {isDragActive ? 'Drop files here...' : 'Drag & drop PDFs, Word docs, or text files, or click to browse'}
         </p>
-        <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">Structured extraction, chunking, and indexing start automatically after upload.</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">PDF, DOCX, TXT, MD, CSV · Max 20MB per file</p>
       </div>
 
       {/* Pending files list */}
@@ -96,18 +86,18 @@ export default function UploadZone() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="flex items-center gap-2 bg-white/80 dark:bg-slate-950/70 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl px-3 py-2.5"
+            className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg px-3 py-2"
           >
             <FileText size={16} className="text-primary-500 flex-shrink-0" />
-            <span className="text-xs text-slate-700 dark:text-slate-300 truncate flex-1">
+            <span className="text-xs text-gray-700 dark:text-gray-300 truncate flex-1">
               {file.name}
             </span>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-gray-400">
               {(file.size / 1024 / 1024).toFixed(1)}MB
             </span>
             <button
               onClick={() => removeFile(file.name)}
-              className="text-slate-400 hover:text-red-500 transition-colors"
+              className="text-gray-400 hover:text-red-500 transition-colors"
             >
               <X size={14} />
             </button>
@@ -118,13 +108,13 @@ export default function UploadZone() {
       {/* Upload progress */}
       {uploadState === 'uploading' && (
         <div className="space-y-1">
-          <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
             <span>Uploading & indexing...</span>
             <span>{progress}%</span>
           </div>
-          <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
             <motion.div
-              className="bg-gradient-to-r from-primary-600 to-cyan-500 h-1.5 rounded-full"
+              className="bg-primary-500 h-1.5 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.3 }}
@@ -135,7 +125,7 @@ export default function UploadZone() {
 
       {/* Status messages */}
       {uploadState === 'success' && (
-        <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-sm">
+        <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm">
           <CheckCircle size={16} />
           <span>Documents indexed successfully!</span>
         </div>
@@ -151,7 +141,7 @@ export default function UploadZone() {
       {pendingFiles.length > 0 && uploadState === 'idle' && (
         <button
           onClick={handleUpload}
-          className="w-full py-3 bg-gradient-to-r from-primary-600 to-cyan-500 hover:from-primary-700 hover:to-cyan-600 text-white text-sm font-semibold rounded-2xl transition-all shadow-lg shadow-primary-600/20"
+          className="w-full py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors"
         >
           Upload {pendingFiles.length} file{pendingFiles.length > 1 ? 's' : ''}
         </button>

@@ -43,28 +43,33 @@ export default function MessageBubble({ message, index, onResend, isLoading }) {
   }
 
   const handleRegenerate = () => {
-    // Prefer the stored source question, then fall back to the message content.
-    onResend(index - 1, message._prevQuestion || message._question || editValue)
+    // Prefer stored prev user question (set during streaming + history load), then fall back.
+    const question = message._prevQuestion || message._question || editValue
+    // Assistant message's "question" is the previous user message, but onResend() edits by index.
+    // Use a stable fallback index for safety.
+    const targetIndex = Math.max(0, index - 1)
+    onResend(targetIndex, question)
   }
+
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.18 }}
-      className={`group flex gap-3 px-1 sm:px-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
+      className={`group flex gap-3 px-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
     >
       {/* Avatar */}
-      <div className={`flex-shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center mt-0.5 shadow-sm ${
+      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1 ${
         isUser
-          ? 'bg-gradient-to-br from-primary-600 to-cyan-500 text-white'
-          : 'bg-white/70 dark:bg-slate-900/80 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80'
+          ? 'bg-primary-600 text-white'
+          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
       }`}>
         {isUser ? <User size={15} /> : <Bot size={15} />}
       </div>
 
       {/* Bubble + actions */}
-      <div className={`flex flex-col max-w-[84%] sm:max-w-[78%] ${isUser ? 'items-end' : 'items-start'}`}>
+      <div className={`flex flex-col max-w-[78%] ${isUser ? 'items-end' : 'items-start'}`}>
 
         {/* Edit mode for user messages */}
         {isUser && isEditing ? (
@@ -75,19 +80,19 @@ export default function MessageBubble({ message, index, onResend, isLoading }) {
               onChange={(e) => setEditValue(e.target.value)}
               onKeyDown={handleKeyDown}
               rows={3}
-              className="w-full resize-none rounded-[22px] border border-primary-300 dark:border-primary-700 px-4 py-3 text-sm bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500 shadow-sm"
+              className="w-full resize-none rounded-2xl border border-primary-400 px-4 py-3 text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
             <div className="flex gap-2 mt-2 justify-end">
               <button
                 onClick={() => { setIsEditing(false); setEditValue(message.content) }}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <X size={12} /> Cancel
               </button>
               <button
                 onClick={handleEditSubmit}
                 disabled={isLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-gradient-to-r from-primary-600 to-cyan-500 hover:from-primary-700 hover:to-cyan-600 text-white transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-primary-600 hover:bg-primary-700 text-white transition-colors disabled:opacity-50"
               >
                 <Send size={12} /> Send
               </button>
@@ -96,10 +101,10 @@ export default function MessageBubble({ message, index, onResend, isLoading }) {
         ) : (
           <>
             {/* Message bubble */}
-            <div className={`px-4 py-3 rounded-[24px] text-sm leading-relaxed ${
+            <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${
               isUser
-                ? 'bg-gradient-to-br from-primary-600 to-primary-700 text-white rounded-tr-md shadow-lg shadow-primary-600/15'
-                : 'bg-white/85 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 rounded-tl-md shadow-sm border border-slate-200/80 dark:border-slate-700/80 backdrop-blur'
+                ? 'bg-primary-600 text-white rounded-tr-sm'
+                : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-sm shadow-sm border border-gray-100 dark:border-gray-700'
             }`}>
               {isUser ? (
                 <p className="whitespace-pre-wrap">{message.content}</p>
@@ -152,7 +157,7 @@ export default function MessageBubble({ message, index, onResend, isLoading }) {
           <div className="w-full mt-2">
             <button
               onClick={() => setShowSources((s) => !s)}
-              className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
             >
               <FileText size={12} />
               <span>{message.sources.length} source{message.sources.length > 1 ? 's' : ''}</span>
@@ -168,20 +173,20 @@ export default function MessageBubble({ message, index, onResend, isLoading }) {
                   className="mt-2 space-y-2 overflow-hidden"
                 >
                   {message.sources.map((src, i) => (
-                    <div key={i} className="bg-slate-50/90 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-3 backdrop-blur">
+                    <div key={i} className="bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
                       <div className="flex items-center gap-2 mb-1.5">
                         <FileText size={12} className="text-primary-500 flex-shrink-0" />
-                        <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 truncate">
+                        <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate">
                           {src.filename}
                         </span>
-                        <span className="text-xs text-slate-400 dark:text-slate-500 flex-shrink-0">
+                        <span className="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">
                           Page {src.page_number}
                         </span>
-                        <span className="ml-auto text-xs font-semibold text-primary-600 dark:text-primary-400 flex-shrink-0">
+                        <span className="ml-auto text-xs font-medium text-primary-600 dark:text-primary-400 flex-shrink-0">
                           {(src.score * 100).toFixed(0)}%
                         </span>
                       </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">
+                      <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-3 leading-relaxed">
                         {src.content}
                       </p>
                     </div>
@@ -201,7 +206,7 @@ function ActionBtn({ onClick, title, children }) {
     <button
       onClick={onClick}
       title={title}
-      className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+      className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
     >
       {children}
     </button>
@@ -214,7 +219,7 @@ function TypingIndicator() {
       {[0, 1, 2].map((i) => (
         <span
           key={i}
-          className="w-2 h-2 bg-slate-400 dark:bg-slate-500 rounded-full inline-block"
+          className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full inline-block"
           style={{ animation: 'pulseDot 1.4s infinite ease-in-out', animationDelay: `${i * 0.16}s` }}
         />
       ))}

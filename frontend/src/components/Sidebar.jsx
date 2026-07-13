@@ -125,15 +125,13 @@ export default function Sidebar() {
         onCancel={() => setConfirm(null)}
       />
 
-      <aside className="w-[340px] flex-shrink-0 h-full flex flex-col gap-4 overflow-hidden">
-
-        <div className="glass-panel rounded-[28px] overflow-hidden flex flex-col h-full">
+      <aside className="w-72 flex-shrink-0 h-full flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700">
 
         {/* New Chat button */}
-        <div className="p-4 border-b border-slate-200/70 dark:border-slate-800/70">
+        <div className="p-3 border-b border-gray-200 dark:border-gray-700">
           <button
             onClick={newChat}
-            className="w-full flex items-center justify-center gap-2 px-3 py-3 bg-gradient-to-r from-primary-600 to-cyan-500 hover:from-primary-700 hover:to-cyan-600 text-white text-sm font-semibold rounded-2xl transition-all shadow-lg shadow-primary-600/20"
+            className="w-full flex items-center gap-2 px-3 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-xl transition-colors"
           >
             <Plus size={16} />
             New Chat
@@ -141,7 +139,7 @@ export default function Sidebar() {
         </div>
 
         {/* Tab switcher */}
-        <div className="mx-4 mt-4 p-1 rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 border border-slate-200/70 dark:border-slate-800/70 flex">
+        <div className="flex border-b border-gray-200 dark:border-gray-700">
           {[
             { id: 'chats', label: 'Chats', icon: MessageSquare },
             { id: 'docs', label: 'Documents', icon: BookOpen },
@@ -149,16 +147,16 @@ export default function Sidebar() {
             <button
               key={id}
               onClick={() => setActiveTab(id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold rounded-xl transition-all ${
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors border-b-2 ${
                 activeTab === id
-                  ? 'bg-white dark:bg-slate-950 text-primary-700 dark:text-primary-300 shadow-sm'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
               <Icon size={14} />
               {label}
               {id === 'docs' && documents.length > 0 && (
-                <span className="bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full px-1.5 py-0.5 text-xs leading-none">
+                <span className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full px-1.5 py-0.5 text-xs leading-none">
                   {documents.length}
                 </span>
               )}
@@ -167,7 +165,7 @@ export default function Sidebar() {
         </div>
 
         {/* Tab content */}
-        <div className="flex-1 overflow-hidden flex flex-col px-3 pb-3 pt-4">
+        <div className="flex-1 overflow-hidden flex flex-col">
           {activeTab === 'chats' ? (
             <ChatsPanel
               sessions={sessions}
@@ -199,7 +197,6 @@ export default function Sidebar() {
             />
           )}
         </div>
-        </div>
       </aside>
     </>
   )
@@ -212,10 +209,10 @@ function ChatsPanel({ sessions, currentSessionId, onLoad, onDelete, onRefresh })
 
   if (sessions.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center flex-1 text-center px-4 py-8 rounded-3xl border border-dashed border-slate-200/80 dark:border-slate-800/80 bg-white/40 dark:bg-slate-950/20">
-        <MessageSquare size={32} className="text-slate-300 dark:text-slate-600 mb-3" />
-        <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">No chat history yet</p>
-        <p className="text-xs text-slate-500 dark:text-slate-500 mt-1 max-w-[180px]">Start a conversation to see it here</p>
+      <div className="flex flex-col items-center justify-center flex-1 text-center px-4 py-8">
+        <MessageSquare size={32} className="text-gray-300 dark:text-gray-600 mb-2" />
+        <p className="text-xs text-gray-400 dark:text-gray-500">No chat history yet</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Start a conversation to see it here</p>
       </div>
     )
   }
@@ -223,10 +220,10 @@ function ChatsPanel({ sessions, currentSessionId, onLoad, onDelete, onRefresh })
   const grouped = groupByDate(sessions)
 
   return (
-    <div className="flex-1 overflow-y-auto py-2 scrollbar-thin space-y-4">
+    <div className="flex-1 overflow-y-auto py-2 scrollbar-thin">
       {Object.entries(grouped).map(([label, items]) => (
         <div key={label}>
-          <p className="px-3 py-1.5 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.28em]">
+          <p className="px-3 py-1.5 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">
             {label}
           </p>
           <AnimatePresence>
@@ -236,29 +233,29 @@ function ChatsPanel({ sessions, currentSessionId, onLoad, onDelete, onRefresh })
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -16 }}
-                className={`group relative flex items-center gap-2 mx-1 px-3 py-3 rounded-2xl cursor-pointer transition-all border ${
+                className={`group relative flex items-center gap-2 mx-2 px-3 py-2.5 rounded-lg cursor-pointer transition-colors ${
                   currentSessionId === session.session_id
-                    ? 'bg-white dark:bg-slate-950 border-primary-200/80 dark:border-primary-800/80 shadow-sm'
-                    : 'bg-white/40 dark:bg-slate-950/25 border-transparent hover:border-slate-200/80 dark:hover:border-slate-800/80 hover:shadow-sm'
+                    ? 'bg-primary-50 dark:bg-primary-900/30'
+                    : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
                 onClick={() => onLoad(session.session_id)}
               >
-                <MessageSquare size={14} className="flex-shrink-0 text-slate-400" />
+                <MessageSquare size={14} className="flex-shrink-0 text-gray-400" />
                 <div className="flex-1 min-w-0">
                   <p className={`text-xs truncate ${
                     currentSessionId === session.session_id
-                      ? 'text-primary-700 dark:text-primary-300 font-semibold'
-                      : 'text-slate-700 dark:text-slate-300'
+                      ? 'text-primary-700 dark:text-primary-300 font-medium'
+                      : 'text-gray-700 dark:text-gray-300'
                   }`}>
                     {session.title}
                   </p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500">
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
                     {session.message_count} messages
                   </p>
                 </div>
                 <button
                   onClick={(e) => { e.stopPropagation(); onDelete(session.session_id, session.title) }}
-                  className="opacity-0 group-hover:opacity-100 p-1 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all flex-shrink-0"
+                  className="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all flex-shrink-0"
                 >
                   <Trash2 size={13} />
                 </button>
@@ -276,19 +273,19 @@ function ChatsPanel({ sessions, currentSessionId, onLoad, onDelete, onRefresh })
 function DocsPanel({ documents, selectedDocIds, onToggle, onDelete }) {
   return (
     <div className="flex-1 overflow-y-auto flex flex-col scrollbar-thin">
-      <div className="p-3 rounded-3xl border border-slate-200/70 dark:border-slate-800/70 bg-white/50 dark:bg-slate-950/30">
+      <div className="p-3 border-b border-gray-200 dark:border-gray-700">
         <UploadZone />
       </div>
 
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {documents.length === 0 ? (
-          <div className="text-center py-8 text-slate-400 dark:text-slate-500">
+          <div className="text-center py-8 text-gray-400 dark:text-gray-500">
             <FileText size={32} className="mx-auto mb-2 opacity-40" />
-            <p className="text-sm font-semibold">No documents yet</p>
+            <p className="text-xs">No documents yet</p>
           </div>
         ) : (
           <>
-            <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400 px-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 px-1">
               {selectedDocIds.length === 0
                 ? 'Searching all documents'
                 : `Searching ${selectedDocIds.length} selected`}
@@ -302,27 +299,27 @@ function DocsPanel({ documents, selectedDocIds, onToggle, onDelete }) {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    className={`group flex items-start gap-3 p-3 rounded-2xl cursor-pointer transition-all border ${
+                    className={`group flex items-start gap-2 p-2.5 rounded-lg cursor-pointer transition-colors ${
                       isSelected
-                        ? 'bg-white dark:bg-slate-950 border-primary-200/80 dark:border-primary-800/80 shadow-sm'
-                        : 'bg-white/45 dark:bg-slate-950/25 border-transparent hover:border-slate-200/80 dark:hover:border-slate-800/80 hover:shadow-sm'
+                        ? 'bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-700'
+                        : 'hover:bg-gray-50 dark:hover:bg-gray-800 border border-transparent'
                     }`}
                     onClick={() => onToggle(doc.document_id)}
                   >
                     <div className="mt-0.5 flex-shrink-0 text-primary-500">
-                      {isSelected ? <CheckSquare size={16} /> : <Square size={16} className="text-slate-400" />}
+                      {isSelected ? <CheckSquare size={16} /> : <Square size={16} className="text-gray-400" />}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">
+                      <p className="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">
                         {doc.filename}
                       </p>
-                      <p className="text-xs text-slate-400 dark:text-slate-500">
+                      <p className="text-xs text-gray-400 dark:text-gray-500">
                         {doc.page_count} pages · {doc.chunk_count} chunks
                       </p>
                     </div>
                     <button
                       onClick={(e) => { e.stopPropagation(); onDelete(doc.document_id, doc.filename) }}
-                      className="opacity-0 group-hover:opacity-100 p-1 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all flex-shrink-0"
+                      className="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all flex-shrink-0"
                     >
                       <Trash2 size={14} />
                     </button>

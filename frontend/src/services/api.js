@@ -14,7 +14,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || '/api/v1'
 
 const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 60000,   // 60s for large PDF uploads
+  timeout: 60000, // 60s for large PDF uploads
 })
 
 // ── Request interceptor: attach auth token if present ────────────────────────
@@ -108,6 +108,11 @@ export const deleteDocument = async (documentId) => {
  * Streaming chat using the Fetch API + ReadableStream.
  * Axios doesn't support SSE streaming, so we use native fetch here.
  *
+ * SSE format from backend:
+ *   data: <token>\n\n
+ *   data: [SOURCES]<json>\n\n
+ *   data: [DONE]\n\n
+ *
  * @param {string} question
  * @param {string} sessionId
  * @param {string[]} documentIds
@@ -147,16 +152,32 @@ export const streamChat = async (
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
 
+    // Important: SSE frames can be split across multiple reads.
+    // Buffer and only parse complete `data:` events separated by blank lines.
+    let buffer = ''
+
     while (true) {
       const { done, value } = await reader.read()
       if (done) break
 
-      const text = decoder.decode(value, { stream: true })
-      // SSE format: "data: <content>\n\n"
-      const lines = text.split('\n').filter((l) => l.startsWith('data: '))
+      buffer += decoder.decode(value, { stream: true })
 
-      for (const line of lines) {
-        const data = line.slice(6)   // remove "data: " prefix
+      // Parse complete SSE events (separated by blank line)
+      const parts = buffer.split('\n\n')
+      buffer = parts.pop() || ''
+
+      for (const part of parts) {
+        // Each event can have multiple `data:` lines; join them with \n.
+        const dataLines = part
+          .split('\n')
+          .map((l) => l.trim())
+          .filter((l) => l.startsWith('data:'))
+
+        if (dataLines.length === 0) continue
+
+        const data = dataLines
+          .map((l) => l.slice('data:'.length).trimStart())
+          .join('\n')
 
         if (data === '[DONE]') {
           onDone()
@@ -164,13 +185,13 @@ export const streamChat = async (
         }
 
         if (data.startsWith('[ERROR]')) {
-          onError(new Error(data.slice(7)))
+          onError(new Error(data.slice('[ERROR]'.length)))
           return
         }
 
         if (data.startsWith('[SOURCES]')) {
           try {
-            const sources = JSON.parse(data.slice(9))
+            const sources = JSON.parse(data.slice('[SOURCES]'.length))
             onSources(sources)
           } catch {
             // ignore parse errors on sources
@@ -178,7 +199,7 @@ export const streamChat = async (
           continue
         }
 
-        // Regular token — unescape newlines
+        // Regular token — unescape newlines that backend encoded as "\\n"
         onToken(data.replace(/\\n/g, '\n'))
       }
     }
@@ -188,3 +209,4 @@ export const streamChat = async (
 }
 
 export default api
+

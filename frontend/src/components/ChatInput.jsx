@@ -46,10 +46,9 @@ const ChatInput = forwardRef(function ChatInput({ onSend, isLoading }, ref) {
   }
 
   return (
-    <div className="p-4 sm:p-5">
-      <div className="glass-panel rounded-[28px] px-4 sm:px-5 py-4 sm:py-5 soft-ring">
-        <div className="flex flex-wrap items-end gap-3 max-w-5xl mx-auto">
-          <div className="flex-1 relative min-w-[240px]">
+    <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4">
+      <div className="flex items-end gap-3 max-w-4xl mx-auto">
+        <div className="flex-1 relative">
           <textarea
             ref={textareaRef}
             value={value}
@@ -60,52 +59,47 @@ const ChatInput = forwardRef(function ChatInput({ onSend, isLoading }, ref) {
             rows={1}
             maxLength={2000}
             className={`
-              w-full resize-none rounded-[22px] border px-4 py-3 pr-12 text-sm
-              bg-white/90 dark:bg-slate-950/70
-              border-slate-200/80 dark:border-slate-700/80
-              text-slate-800 dark:text-slate-100
-              placeholder-slate-400 dark:placeholder-slate-500
+              w-full resize-none rounded-xl border px-4 py-3 pr-12 text-sm
+              bg-gray-50 dark:bg-gray-800
+              border-gray-200 dark:border-gray-600
+              text-gray-800 dark:text-gray-200
+              placeholder-gray-400 dark:placeholder-gray-500
               focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
               disabled:opacity-50 disabled:cursor-not-allowed
-              transition-all duration-200 scrollbar-thin shadow-sm
+              transition-all duration-200 scrollbar-thin
             `}
           />
           {/* Character counter */}
           {value.length > 1800 && (
-            <span className="absolute bottom-2 right-12 text-xs text-slate-400">
+            <span className="absolute bottom-2 right-12 text-xs text-gray-400">
               {2000 - value.length}
             </span>
           )}
-          </div>
-
-          <button
-            onClick={handleSend}
-            disabled={!value.trim() || isLoading}
-            className={`
-              flex-shrink-0 h-12 px-5 rounded-[22px] flex items-center justify-center gap-2 font-semibold text-sm
-              transition-all duration-200
-              ${value.trim() && !isLoading
-                ? 'bg-gradient-to-r from-primary-600 to-cyan-500 hover:from-primary-700 hover:to-cyan-600 text-white shadow-lg shadow-primary-600/20'
-                : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
-              }
-            `}
-          >
-            {isLoading ? (
-              <Loader2 size={18} className="animate-spin" />
-            ) : (
-              <Send size={18} />
-            )}
-            <span className="hidden sm:inline">Send</span>
-          </button>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400 max-w-5xl mx-auto">
-          <p>Enter to send · Shift+Enter for a new line</p>
-          <span className="inline-flex items-center rounded-full border border-slate-200/80 dark:border-slate-700/80 bg-white/70 dark:bg-slate-950/50 px-2.5 py-1">
-            2,000 character limit
-          </span>
-        </div>
+        {/* Send button */}
+        <button
+          onClick={handleSend}
+          disabled={!value.trim() || isLoading}
+          className={`
+            flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center
+            transition-all duration-200
+            ${value.trim() && !isLoading
+              ? 'bg-primary-600 hover:bg-primary-700 text-white shadow-md hover:shadow-lg'
+              : 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
+            }
+          `}
+        >
+          {isLoading ? (
+            <Loader2 size={18} className="animate-spin" />
+          ) : (
+            <Send size={18} />
+          )}
+        </button>
       </div>
+      <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-2">
+        Press Enter to send · Shift+Enter for new line
+      </p>
     </div>
   )
 })
