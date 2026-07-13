@@ -261,31 +261,6 @@ pytest tests/ -v
 
 ---
 
-## Interview Q&A
-
-**Q: What is RAG and why use it instead of fine-tuning?**
-A: RAG (Retrieval-Augmented Generation) retrieves relevant documents at query time and injects them into the prompt. Fine-tuning bakes knowledge into model weights — expensive, slow to update, and prone to hallucination on specific facts. RAG is cheaper, updatable in real-time, and provides citations.
-
-**Q: Why chunk documents instead of feeding the whole PDF?**
-A: LLMs have a context window limit (e.g., 16K tokens for GPT-3.5). A 100-page PDF is ~75K tokens. Chunking splits text into pieces that fit the window. Overlap preserves context across boundaries.
-
-**Q: How does semantic search work?**
-A: Text is converted to dense vectors (embeddings) where semantically similar text has similar vectors. FAISS computes cosine similarity between the query vector and all stored chunk vectors, returning the top-K closest matches — even without keyword overlap.
-
-**Q: Why FAISS over Pinecone/Qdrant?**
-A: FAISS is free, runs locally, and is perfect for prototypes and small-medium datasets (<10M vectors). Pinecone/Qdrant are managed cloud services with better scalability, filtering, and multi-tenancy for production at scale.
-
-**Q: How does streaming work?**
-A: The LLM generates tokens one at a time. We use Server-Sent Events (SSE) — a one-way HTTP stream. The backend yields each token as `data: <token>\n\n`. The frontend reads the stream with `fetch` + `ReadableStream`, appending tokens to the UI in real-time.
-
-**Q: How do you prevent hallucination?**
-A: The system prompt explicitly instructs the model to answer ONLY from the provided context and say "I don't know" if the context is insufficient. Temperature is set to 0.1 (near-deterministic). Source citations make hallucinations verifiable.
-
-**Q: How does conversation memory work?**
-A: Each session has a JSON file storing all messages. The last N turns are injected into the prompt as `chat_history` via LangChain's `MessagesPlaceholder`. This gives the model context of the conversation without exceeding the token limit.
-
----
-
 ## Tech Stack Summary
 
 | Layer | Technology |
